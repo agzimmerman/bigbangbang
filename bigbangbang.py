@@ -1,4 +1,4 @@
-from pygame import *
+import pygame
 import random
 import numpy as np
 
@@ -8,18 +8,18 @@ delay = 100
 dt = 1.
 G = 1.
 
-init()
-display_height = 640.
-display_width = 640.
+pygame.init()
+display_height = 800.
+display_width = 800.
 center = (display_height/2., display_width/2.)
-screen = display.set_mode((int(display_height), int(display_width)))
-display.set_caption('Big Bang! Bang!')
+screen = pygame.display.set_mode((int(display_height), int(display_width)))
+pygame.display.set_caption('Big Bang! Bang!')
 
-circle = image.load('pics/circle.png')
+circle = pygame.image.load('pics/circle.png')
 
 def color_surface(surface, red, green, blue):
     # https://gamedev.stackexchange.com/questions/26550/how-can-a-pygame-image-be-colored
-    arr = surfarray.pixels3d(surface)
+    arr = pygame.surfarray.pixels3d(surface)
     arr[:,:,0] = red
     arr[:,:,1] = green
     arr[:,:,2] = blue
@@ -34,7 +34,7 @@ class Body:
         self.position = np.array(position)
         self.velocity = np.array(velocity)
         
-        self.pic = transform.scale(circle.copy(), (2*radius, 2*radius))
+        self.pic = pygame.transform.scale(circle.copy(), (2*radius, 2*radius))
         self.pic.set_colorkey((0,0,0))
         self.pic.convert_alpha()
         color_surface(self.pic, color[0], color[1], color[2])
@@ -53,8 +53,8 @@ class Body:
         self.velocity += a*dt
 
 star = Body(mass=200, radius=50)
-us = Body(mass=1, radius=25, position=(center[0] + display_width/4., center[1]), velocity=(0., -1.), color=(0, 0, 255))
-them = Body(mass=0.8, radius=20, position=(center[0] - display_width/4., center[1]), velocity=(0., 1.), color=(255, 0, 0))
+us = Body(mass=1, radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
+them = Body(mass=0.8, radius=20, position=(30, center[1]), velocity=(0., 0.7), color=(255, 0, 0))
 
 done = False    
 while done == False:
@@ -67,14 +67,32 @@ while done == False:
         body.draw()
         force = body.compute_force(star)
         body.move(force)
+        
+    if 'rock' in locals():
+        rock.draw()
+        force = rock.compute_force(star) + rock.compute_force(us) + rock.compute_force(them)
+        rock.move(force)
     
-    display.update()
+    pygame.display.update()
     
-    time.delay(delay)
+    events = pygame.event.get()
     
-    for e in event.get():
-        if e.type == KEYUP:
-            if e.key == K_ESCAPE:
+    for event in events:
+    
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            press_position = np.array(mouse.get_pos())
+            print "pressed at "+str(press_position)
+    
+        if event.type == pygame.MOUSEBUTTONUP:
+            release_position = np.array(mouse.get_post())
+            print "released at "+str(release_position)
+            rock = Body(mass=0.1, radius=0.2, position=press_position, velocity=(press_position - release_position)/us.radius)
+    
+    pygame.time.delay(delay)
+    
+    for e in pygame.event.get():
+        if e.type == pygame.KEYUP:
+            if e.key == pygame.K_ESCAPE:
                 done = True
 
-print "That took ", time.get_ticks()/1000, " seconds."
+print "That took ", pygame.time.get_ticks()/1000, " seconds."
