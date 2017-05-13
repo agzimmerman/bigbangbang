@@ -3,8 +3,9 @@ import random
 import numpy as np
 
 partpic = image.load('part.png')
-
 partpic.set_colorkey((0,0,0))
+big_partpic = transform.scale2x(partpic)
+width, height = partpic.get_size()
 
 partcount = 3
 delay = 100
@@ -27,15 +28,16 @@ for ip in range(partcount):
     parts.append(dict)
     parts[ip] = {'mass': masses[ip], 'x': starting_positions[ip][0], 'y': starting_positions[ip][1], 'u': starting_velocities[ip][0], 'v': starting_velocities[ip][1]}
 
+    
 done = False    
 while done == False:
 
     screen.fill(0)
     
-    screen.blit(partpic, (int(round(parts[0]['x'])), int(round(parts[0]['y']))))
+    screen.blit(big_partpic, (int(round(parts[0]['x']))  - width, int(round(parts[0]['y']))  - height))
     
     for ip in range(1, partcount):
-        screen.blit(partpic, (int(round(parts[ip]['x'])), int(round(parts[ip]['y']))))
+        screen.blit(partpic, (int(round(parts[ip]['x'])) - width/2, int(round(parts[ip]['y'])) - height/2))
         parts[ip]['x'] += parts[ip]['u']*dt
         parts[ip]['y'] += parts[ip]['v']*dt
         rx = (parts[ip]['x'] - parts[0]['x'])
