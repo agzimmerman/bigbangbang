@@ -6,9 +6,9 @@ partpic = image.load('part.png')
 partpic.set_colorkey((0,0,0))
 
 partcount = 2
-delay = 1
+delay = 100
 
-dt = 10.
+dt = 1.
 
 done = False
 
@@ -33,8 +33,6 @@ for ip in range(partcount):
     parts.append(dict)
     parts[ip] = {'mass': masses[ip], 'x': starting_positions[ip][0], 'y': starting_positions[ip][1], 'u': starting_velocities[ip][0], 'v': starting_velocities[ip][1]}
     
-print parts
-
 while done == False:
     screen.fill(0)
     
@@ -53,8 +51,6 @@ while done == False:
         parts[ip]['v'] += a[1]*dt
     
     display.update()
-    
-    raw_input("Press Enter to continue...")
     
     time.delay(delay)
     
