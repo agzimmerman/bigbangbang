@@ -5,7 +5,6 @@ import numpy as np
 # @todo Us vs. Them
 
 fps = 60
-delay = 0
 dt = 1.
 G = 1.
 
@@ -86,7 +85,7 @@ while done == False:
         
         if event.type == pygame.MOUSEBUTTONUP:
             release_position = np.array(event.pos).astype(float)
-            rock = Body(mass=1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius))
+            rock = Body(mass=0.1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius))
             
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
