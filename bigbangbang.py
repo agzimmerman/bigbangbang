@@ -4,7 +4,8 @@ import numpy as np
 
 # @todo Us vs. Them
 
-delay = 100
+fps = 60
+delay = 0
 dt = 1.
 G = 1.
 
@@ -27,7 +28,7 @@ def color_surface(surface, red, green, blue):
     
 class Body:
 
-    def __init__(self, mass=1, radius=1, position=(center[0], center[1]), velocity=(0,0), color=(255,255,255)):
+    def __init__(self, mass=1., radius=1, position=(center[0], center[1]), velocity=(0,0), color=(255,255,255)):
         
         self.mass = mass
         self.radius = radius
@@ -53,12 +54,15 @@ class Body:
         self.velocity += a*dt
 
 star = Body(mass=200, radius=50)
-us = Body(mass=1, radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
-them = Body(mass=0.8, radius=20, position=(30, center[1]), velocity=(0., 0.7), color=(255, 0, 0))
+us = Body(mass=10., radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
+them = Body(mass=8., radius=20, position=(30, center[1]), velocity=(0., 0.7), color=(255, 0, 0))
+
+clock = pygame.time.Clock()
 
 done = False    
 while done == False:
-
+    clock.tick(fps)
+    
     screen.fill(0)
     
     star.draw()
@@ -75,24 +79,17 @@ while done == False:
     
     pygame.display.update()
     
-    events = pygame.event.get()
-    
-    for event in events:
+    for event in pygame.event.get():
     
         if event.type == pygame.MOUSEBUTTONDOWN:
-            press_position = np.array(mouse.get_pos())
-            print "pressed at "+str(press_position)
-    
+            press_position = np.array(event.pos).astype(float)
+        
         if event.type == pygame.MOUSEBUTTONUP:
-            release_position = np.array(mouse.get_post())
-            print "released at "+str(release_position)
-            rock = Body(mass=0.1, radius=0.2, position=press_position, velocity=(press_position - release_position)/us.radius)
-    
-    pygame.time.delay(delay)
-    
-    for e in pygame.event.get():
-        if e.type == pygame.KEYUP:
-            if e.key == pygame.K_ESCAPE:
+            release_position = np.array(event.pos).astype(float)
+            rock = Body(mass=1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius))
+            
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
                 done = True
 
 print "That took ", pygame.time.get_ticks()/1000, " seconds."
