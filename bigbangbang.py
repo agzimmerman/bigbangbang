@@ -3,16 +3,13 @@ import random
 import numpy as np
 
 partpic = image.load('part.png')
+
 partpic.set_colorkey((0,0,0))
 
-partcount = 2
+partcount = 3
 delay = 100
-
 dt = 1.
-
-done = False
-
-parts = []
+G = 200.
 
 init()
 display_height = 640.
@@ -21,19 +18,18 @@ center = (display_height/2., display_width/2.)
 screen = display.set_mode((int(display_height), int(display_width)))
 display.set_caption('Big Bang! Bang!')
 
-G = 200.
+masses = [1., 1., 1.]
+starting_positions = [(center[0], center[1]), (center[0] + display_width/4., center[1]), (center[0] - display_width/4., center[1])]
+starting_velocities = [(0., 0.), (0., -1.), (0., 1.)]
 
-masses = [1., 1.]
-starting_positions = [(center[0], center[1]), (center[0] + display_width/4., center[1])]
-starting_velocities = [(0., 0.), (0., -1.)]
-
-assert len(masses) == partcount
-
+parts = []
 for ip in range(partcount):
     parts.append(dict)
     parts[ip] = {'mass': masses[ip], 'x': starting_positions[ip][0], 'y': starting_positions[ip][1], 'u': starting_velocities[ip][0], 'v': starting_velocities[ip][1]}
-    
+
+done = False    
 while done == False:
+
     screen.fill(0)
     
     screen.blit(partpic, (int(round(parts[0]['x'])), int(round(parts[0]['y']))))
@@ -50,8 +46,7 @@ while done == False:
         parts[ip]['u'] += a[0]*dt
         parts[ip]['v'] += a[1]*dt
     
-    display.update()
-    
+    display.update()    
     time.delay(delay)
     
     for e in event.get():
