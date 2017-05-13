@@ -6,7 +6,7 @@ import numpy as np
 
 delay = 100
 dt = 1.
-G = 200.
+G = 1.
 
 init()
 display_height = 640.
@@ -52,9 +52,9 @@ class Body:
         a = -force/self.mass
         self.velocity += a*dt
 
-star = Body(mass=1, radius=50)
+star = Body(mass=200, radius=50)
 us = Body(mass=1, radius=25, position=(center[0] + display_width/4., center[1]), velocity=(0., -1.), color=(0, 0, 255))
-them = Body(mass=1, radius=20, position=(center[0] - display_width/4., center[1]), velocity=(0., 1.), color=(255, 0, 0))
+them = Body(mass=0.8, radius=20, position=(center[0] - display_width/4., center[1]), velocity=(0., 1.), color=(255, 0, 0))
 
 done = False    
 while done == False:
