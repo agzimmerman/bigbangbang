@@ -51,6 +51,11 @@ class Body:
         self.position += self.velocity*dt
         a = -force/self.mass
         self.velocity += a*dt
+        
+    def struck(self, other):
+        # Ideally Body would inherit from Sprite and this would use sprite.collide_circle(); but that has been hard to use.
+        r = self.position - other.position
+        return np.sqrt(r.dot(r)) < (self.radius + other.radius)
 
 star = Body(mass=200, radius=50)
 us = Body(mass=10., radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
@@ -73,8 +78,23 @@ while done == False:
         
     if 'rock' in locals():
         rock.draw()
+            
         force = rock.compute_force(star) + rock.compute_force(us) + rock.compute_force(them)
         rock.move(force)
+        
+        for body in us, star, them:
+            
+            if rock.struck(body):
+                
+                del rock
+                
+                assert 'rock' not in locals()
+                
+                if body == them:
+                    print "You win!"
+                    raw_input("Press the <ENTER> key to continue...")
+                    
+                break
     
     pygame.display.update()
     
@@ -85,7 +105,7 @@ while done == False:
         
         if event.type == pygame.MOUSEBUTTONUP:
             release_position = np.array(event.pos).astype(float)
-            rock = Body(mass=0.1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius))
+            rock = Body(mass=0.1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius), color=(0, 255, 0))
             
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
