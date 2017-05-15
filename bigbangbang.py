@@ -5,7 +5,7 @@ import numpy as np
 pygame.font.init()
 fontsize = 20
 myfont = pygame.font.SysFont('Comic Sans MS', fontsize)
-textstrings = ["Click and drag the mouse near your blue planet to throw a rock.", "Try to hit the red planet!"]
+textstrings = ["Click and drag the mouse near your blue planet to throw a rock.", "Hit the red planet with the rock, and don't hit yours!", "Hit ESC to exit."]
 
 fps = 60
 dt = 1.
@@ -67,11 +67,11 @@ class Body:
 
 star = Body(mass=200, radius=50)
 us = Body(mass=10., radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
-them = Body(mass=8., radius=20, position=(30, center[1]), velocity=(0., 0.7), color=(255, 0, 0))
+them = Body(mass=20., radius=20, position=(30, center[1]), velocity=(0., 0.7), color=(255, 0, 0))
 
 clock = pygame.time.Clock()
 
-aiming = False
+frozen = False
 done = False    
 while done == False:
     clock.tick(fps)
@@ -91,7 +91,7 @@ while done == False:
 
     for body in [us, them]:
         body.draw()
-        if not aiming:
+        if not frozen:
             force = body.compute_force(star)
             body.move(force)
         
@@ -100,19 +100,25 @@ while done == False:
             
         force = rock.compute_force(star) + rock.compute_force(us) + rock.compute_force(them)
         
-        if not aiming:
+        if not frozen:
             rock.move(force)
         
         for body in us, star, them:
             
             if rock.struck(body):
                 
-                del rock
-                
-                aiming = False # @todo Design a context for aiming
+                frozen = False # @todo Design a context for frozen
                 
                 if body == them:
-                    textstrings = ["You win!"]
+                    frozen = True
+                    
+                    textstrings = ["You win!", "Hit ESC to exit."]
+                if body == us:
+                    frozen = True
+                    
+                    textstrings = ["You lose!", "Hit ESC to exit."]
+                else:
+                    del rock
                     
                 break
 
@@ -123,14 +129,14 @@ while done == False:
         if event.type == pygame.MOUSEBUTTONDOWN:
             press_position = np.array(event.pos).astype(float)
             if us.near(press_position):
-                aiming = True
-                rock = Body(mass=0.01, radius=5, position=press_position, color=(0, 255, 0))
+                frozen = True
+                rock = Body(mass=0.001, radius=5, position=press_position, color=(0, 255, 0))
         
         if event.type == pygame.MOUSEBUTTONUP:
-            if aiming:
+            if frozen:
                 release_position = np.array(event.pos).astype(float)
                 rock.velocity=(press_position - release_position)/float(us.radius)
-                aiming = False
+                frozen = False
             
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
