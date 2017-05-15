@@ -55,10 +55,15 @@ class Body:
         a = -force/self.mass
         self.velocity += a*dt
         
+    def distance(self, position):
+        r = self.position - position
+        return np.sqrt(r.dot(r))
+    
+    def near(self, position):
+        return (self.radius < self.distance(position)) and (self.distance(position) < 2*self.radius)
+        
     def struck(self, other):
-        # Ideally Body would inherit from Sprite and this would use sprite.collide_circle(); but that has been hard to use.
-        r = self.position - other.position
-        return np.sqrt(r.dot(r)) < (self.radius + other.radius)
+        return  self.distance(other.position) < (self.radius + other.radius)
 
 star = Body(mass=200, radius=50)
 us = Body(mass=10., radius=25, position=(center[0] + display_width/5., center[1]), velocity=(0., -1.), color=(0, 0, 255))
@@ -66,6 +71,7 @@ them = Body(mass=8., radius=20, position=(30, center[1]), velocity=(0., 0.7), co
 
 clock = pygame.time.Clock()
 
+aiming = False
 done = False    
 while done == False:
     clock.tick(fps)
@@ -82,22 +88,28 @@ while done == False:
     
     star.draw()
     
+
     for body in [us, them]:
         body.draw()
-        force = body.compute_force(star)
-        body.move(force)
+        if not aiming:
+            force = body.compute_force(star)
+            body.move(force)
         
     if 'rock' in locals():
         rock.draw()
             
         force = rock.compute_force(star) + rock.compute_force(us) + rock.compute_force(them)
-        rock.move(force)
+        
+        if not aiming:
+            rock.move(force)
         
         for body in us, star, them:
             
             if rock.struck(body):
                 
                 del rock
+                
+                aiming = False # @todo Design a context for aiming
                 
                 if body == them:
                     textstrings = ["You win!"]
@@ -110,10 +122,15 @@ while done == False:
     
         if event.type == pygame.MOUSEBUTTONDOWN:
             press_position = np.array(event.pos).astype(float)
+            if us.near(press_position):
+                aiming = True
+                rock = Body(mass=0.01, radius=5, position=press_position, color=(0, 255, 0))
         
         if event.type == pygame.MOUSEBUTTONUP:
-            release_position = np.array(event.pos).astype(float)
-            rock = Body(mass=0.01, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius), color=(0, 255, 0))
+            if aiming:
+                release_position = np.array(event.pos).astype(float)
+                rock.velocity=(press_position - release_position)/float(us.radius)
+                aiming = False
             
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
