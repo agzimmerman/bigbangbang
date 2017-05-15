@@ -105,7 +105,7 @@ while done == False:
         
         if event.type == pygame.MOUSEBUTTONUP:
             release_position = np.array(event.pos).astype(float)
-            rock = Body(mass=0.1, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius), color=(0, 255, 0))
+            rock = Body(mass=0.01, radius=5, position=press_position, velocity=(press_position - release_position)/float(us.radius), color=(0, 255, 0))
             
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
