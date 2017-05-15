@@ -72,8 +72,10 @@ them = Body(mass=20., radius=20, position=(30, center[1]), velocity=(0., 0.7), c
 clock = pygame.time.Clock()
 
 frozen = False
+
 done = False    
 while done == False:
+
     clock.tick(fps)
     
     screen.fill(0)
@@ -88,7 +90,6 @@ while done == False:
     
     star.draw()
     
-
     for body in [us, them]:
         body.draw()
         if not frozen:
@@ -96,6 +97,7 @@ while done == False:
             body.move(force)
         
     if 'rock' in locals():
+    
         rock.draw()
             
         force = rock.compute_force(star) + rock.compute_force(us) + rock.compute_force(them)
