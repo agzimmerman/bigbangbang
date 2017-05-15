@@ -111,11 +111,9 @@ while done == False:
                 
                 if body == them:
                     frozen = True
-                    
                     textstrings = ["You win!", "Hit ESC to exit."]
                 if body == us:
                     frozen = True
-                    
                     textstrings = ["You lose!", "Hit ESC to exit."]
                 else:
                     del rock
