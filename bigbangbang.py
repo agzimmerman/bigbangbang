@@ -2,7 +2,10 @@ import pygame
 import random
 import numpy as np
 
-# @todo Us vs. Them
+pygame.font.init()
+fontsize = 20
+myfont = pygame.font.SysFont('Comic Sans MS', fontsize)
+textstrings = ["Click and drag the mouse near your blue planet to throw a rock.", "Try to hit the red planet!"]
 
 fps = 60
 dt = 1.
@@ -69,6 +72,14 @@ while done == False:
     
     screen.fill(0)
     
+    text = []
+    for string in textstrings:
+        text.append(myfont.render(string, False, (255, 255, 255)))
+    linepos = 0
+    for line in text:
+        screen.blit(line, (10,linepos))
+        linepos += 1.5*fontsize
+    
     star.draw()
     
     for body in [us, them]:
@@ -88,14 +99,11 @@ while done == False:
                 
                 del rock
                 
-                assert 'rock' not in locals()
-                
                 if body == them:
-                    print "You win!"
-                    raw_input("Press the <ENTER> key to continue...")
+                    textstrings = ["You win!"]
                     
                 break
-    
+
     pygame.display.update()
     
     for event in pygame.event.get():
@@ -110,5 +118,3 @@ while done == False:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
                 done = True
-
-print "That took ", pygame.time.get_ticks()/1000, " seconds."
